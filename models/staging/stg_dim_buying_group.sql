@@ -1,25 +1,44 @@
 WITH dim_buying_group AS 
 (
-  SELECT * FROM `vit-lam-data.wide_world_importers.sales__buying_groups`
+    SELECT 
+        BuyingGroupID,
+        BuyingGroupName
+    FROM WideWorldImporters.Sales.BuyingGroups
 ),
 dim_buying_group_rename_column AS 
 (
-  SELECT 
-  buying_group_id AS buying_group_key,
-  buying_group_name
-  FROM
-  dim_buying_group
+    SELECT 
+        BuyingGroupID AS buying_group_key,
+        BuyingGroupName AS buying_group_name
+    FROM dim_buying_group
 ),
 dim_buying_group_change_type AS 
 (
-  SELECT 
-  CAST(buying_group_key AS INTEGER) AS buying_group_key,
-  CAST (buying_group_name AS STRING) AS buying_group_name
-  FROM  
-  dim_buying_group_rename_column
+    SELECT 
+        CAST(buying_group_key AS INT) AS buying_group_key,
+        CAST(buying_group_name AS NVARCHAR(255)) AS buying_group_name
+    FROM dim_buying_group_rename_column
+),
+dim_buying_group_add_undefined AS 
+(
+    SELECT 
+        buying_group_key,
+        buying_group_name
+    FROM dim_buying_group_change_type
+
+    UNION ALL
+
+    SELECT 
+        0 AS buying_group_key,
+        'Undefined' AS buying_group_name
+
+    UNION ALL
+
+    SELECT 
+        -1 AS buying_group_key,
+        'Invalid' AS buying_group_name
 )
 SELECT 
-buying_group_key,
-buying_group_name
-FROM  
-dim_buying_group_change_type
+    buying_group_key,
+    buying_group_name
+FROM dim_buying_group_add_undefined;
