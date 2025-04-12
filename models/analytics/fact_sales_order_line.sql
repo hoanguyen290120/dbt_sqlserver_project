@@ -39,18 +39,10 @@ SELECT
     fact_line.sales_order_key,
     COALESCE(fact_header.customer_key, -1) AS customer_key,
     COALESCE(fact_header.picked_by_person_key, -1) AS picked_by_person_key,
-    CONVERT(
-        BIGINT, 
-        ABS(
-            CHECKSUM(
-                CONCAT(
-                    COALESCE(fact_header.is_undersupply_backordered, 'Undefined'), 
-                    ',', 
-                    CAST(fact_line.package_type_key AS NVARCHAR)
-                )
-            )
-        )
-    ) AS sales_order_line_indicator_key,
+        CONCAT(
+              COALESCE(fact_header.is_undersupply_backordered, 'Undefined'), 
+            ',', fact_line.package_type_key  )
+             AS sales_order_line_indicator_key,
     fact_line.product_key,
     fact_line.quantity,
     fact_line.unit_price,
